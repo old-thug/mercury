@@ -70,26 +70,26 @@ static void parse_flags(struct Flag *flags, int argc, char **argv, struct FStr a
 
                 if (found) {
                     switch (flag->type) {
-                        case FLAG_String: {
-                            const char **out = (const char **)flag->out;
-                            *out = farg;
-                        } break;
-                        case FLAG_FunctionStr: {
-                            flag_str_t fn = (flag_str_t)flag->out;
-                            if (!fn(flag->context, farg)) {
-                                exit(1);
-                            }
-                        } break;
-                        case FLAG_Boolean: {
-                            bool *out = (bool *)flag->out;
-                            *out = true;
-                        } break;
-                        case FLAG_FunctionVoid: {
-                            flag_void_t fn = (flag_void_t)flag->out;
-                            if (!fn(flag->context)) {
-                                exit(1);
-                            }
-                        } break;
+                    case FLAG_String: {
+                        const char **out = (const char **)flag->out;
+                        *out = farg;
+                    } break;
+                    case FLAG_FunctionStr: {
+                        flag_str_t fn = (flag_str_t)flag->out;
+                        if (!fn(flag->context, farg)) {
+                            exit(1);
+                        }
+                    } break;
+                    case FLAG_Boolean: {
+                        bool *out = (bool *)flag->out;
+                        *out = true;
+                    } break;
+                    case FLAG_FunctionVoid: {
+                        flag_void_t fn = (flag_void_t)flag->out;
+                        if (!fn(flag->context)) {
+                            exit(1);
+                        }
+                    } break;
                     }
                     break; 
                 }
@@ -129,29 +129,29 @@ bool parse_codegen_opt(void *context, const char *flag)
     // TODO: make this easier to maintain
     
     for(int n = 0; n < arr_len(codegen_opts); ++n) {
-	if (!strncmp(flag, codegen_opts[n], strlen(codegen_opts[n]))) {
-	    const char *sep = flag + strlen(codegen_opts[n]);
-	    if (*sep != ':' && *sep != '=') {
-		goto failure;
-	    }
-	    const char *arg = sep + 1;
-	    if (!strcmp(codegen_opts[n], "stage")) {
-		if (!strcmp(arg, "asm"))
-		    cmdline->target_stage = STAGE_Asm;
-		else if (!strcmp(arg, "ir"))
-		    cmdline->target_stage = STAGE_Ir;
-		else if (!strcmp(arg, "exe"))
-		    cmdline->target_stage = STAGE_Executable;
-		else if (!strcmp(arg, "obj"))
-		    cmdline->target_stage = STAGE_Object;
-		else {
-		    fprintf(stderr, "error: option `stage` expected one of { exe | asm | obj | ir } not `%s`\n", arg);
-		    goto failure;
-		}
+        if (!strncmp(flag, codegen_opts[n], strlen(codegen_opts[n]))) {
+            const char *sep = flag + strlen(codegen_opts[n]);
+            if (*sep != ':' && *sep != '=') {
+                goto failure;
+            }
+            const char *arg = sep + 1;
+            if (!strcmp(codegen_opts[n], "stage")) {
+                if (!strcmp(arg, "asm"))
+                    cmdline->target_stage = STAGE_Asm;
+                else if (!strcmp(arg, "ir"))
+                    cmdline->target_stage = STAGE_Ir;
+                else if (!strcmp(arg, "exe"))
+                    cmdline->target_stage = STAGE_Executable;
+                else if (!strcmp(arg, "obj"))
+                    cmdline->target_stage = STAGE_Object;
+                else {
+                    fprintf(stderr, "error: option `stage` expected one of { exe | asm | obj | ir } not `%s`\n", arg);
+                    goto failure;
+                }
 		
-		goto success;
-	    }
-	}
+                goto success;
+            }
+        }
     }
     // ===========================
 

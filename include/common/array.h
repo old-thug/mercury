@@ -16,21 +16,21 @@ typedef struct {
 #define array(T) T*
 
 #define arr_init(t, cap) (t*)arr_init_with_elem_size(sizeof(t), cap)
-#define arr_push(arr, item)						\
-    do {								\
-	array_header_t *hdr = (array_header_t*)(arr) - 1;		\
-	if (hdr->count >= hdr->capacity) {				\
-	    usize new_cap = hdr->capacity * 2;				\
-	    if (new_cap == 0)						\
-		new_cap = 40;						\
-	    void *new_buf = malloc(sizeof(array_header_t) + hdr->elem_size * new_cap); \
-	    memcpy(new_buf, hdr, sizeof(array_header_t) + hdr->elem_size * hdr->count); \
-	    free((void*)hdr);						\
-	    hdr = (array_header_t*)new_buf;				\
-	    hdr->capacity = new_cap;					\
-	    arr = (typeof(&arr[0]))(hdr + 1);				\
-	}								\
-	(arr)[hdr->count ++] = item;					\
+#define arr_push(arr, item)                                             \
+    do {                                                                \
+        array_header_t *hdr = (array_header_t*)(arr) - 1;               \
+        if (hdr->count >= hdr->capacity) {                              \
+            usize new_cap = hdr->capacity * 2;                          \
+            if (new_cap == 0)                                           \
+                new_cap = 40;                                           \
+            void *new_buf = malloc(sizeof(array_header_t) + hdr->elem_size * new_cap); \
+            memcpy(new_buf, hdr, sizeof(array_header_t) + hdr->elem_size * hdr->count); \
+            free((void*)hdr);                                           \
+            hdr = (array_header_t*)new_buf;                             \
+            hdr->capacity = new_cap;                                    \
+            arr = (typeof(&arr[0]))(hdr + 1);                           \
+        }                                                               \
+        (arr)[hdr->count ++] = item;                                    \
     } while (0)
 
 inlined
@@ -54,20 +54,20 @@ void arr_destroy(void *arr)
     free(hdr);
 }
 
-#define arr_len(arr) ({						\
-	    array_header_t *hdr = (array_header_t*)arr - 1;	\
-	    hdr->count;						\
-	})
+#define arr_len(arr) ({                                     \
+            array_header_t *hdr = (array_header_t*)arr - 1;	\
+            hdr->count;                                     \
+        })
 
 inlined
 void *arr_reserve(void *arr, usize new_cap)
 {
     array_header_t *hdr = (array_header_t*)arr - 1;
     if (new_cap <= hdr->capacity)
-	return arr;
+        return arr;
 
     array_header_t *new_buf
-	= (array_header_t *)malloc(sizeof(array_header_t) + hdr->elem_size * new_cap);
+        = (array_header_t *)malloc(sizeof(array_header_t) + hdr->elem_size * new_cap);
     memcpy((void*)new_buf, (void*)hdr, sizeof(array_header_t) + hdr->elem_size * hdr->count);
     free((void*)hdr);
     hdr = new_buf;

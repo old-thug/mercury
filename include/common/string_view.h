@@ -21,14 +21,14 @@ StringView sv_init(const char *data, usize length) {
 inlined
 bool sv_equals(StringView s1, StringView s2) {
     if (s1.length != s2.length)
-	return false;
+        return false;
     return !strncmp(s1.data, s2.data, s1.length);
 }
 
 inlined
 bool sv_equals_str(StringView s1, const char *s2) {
     if (s1.length != strlen(s2))
-	return false;
+        return false;
     return !strncmp(s1.data, s2, s1.length);
 }
 

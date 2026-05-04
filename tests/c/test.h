@@ -9,7 +9,7 @@ array(char) create_source(const char *source)
     array(char) arr = arr_init(char, len);
 
     for(int n = 0; n < len; ++n)
-	arr_push(arr, source[n]);
+        arr_push(arr, source[n]);
     return arr;
 }
 

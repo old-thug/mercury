@@ -14,9 +14,9 @@
 #define _first_arg(arg, ...) arg
 #define _rest_arg(arg, ...) __VA_ARGS__
 
-#define todo(...) do {							\
-	fprintf(stderr, "%s:%d: todo: " _first_arg(__VA_ARGS__) "\n", __FILE__, __LINE__ _rest_arg(__VA_ARGS__)); \
-	abort();							\
+#define todo(...) do {                                                  \
+        fprintf(stderr, "%s:%d: todo: " _first_arg(__VA_ARGS__) "\n", __FILE__, __LINE__ _rest_arg(__VA_ARGS__)); \
+        abort();                                                        \
     } while (0)
 
 typedef int8_t   s8;

@@ -29,23 +29,23 @@ int build_compiler()
     
     Files sources = all_files_with_extension(dir, "c", true);
     for (int n = 0; n < sources.count; ++n) {
-	Cmd cmd = {0};
-	cmd_append(&cmd, CC, CC_FLAGS, CC_EXTRA_FLAG);
+        Cmd cmd = {0};
+        cmd_append(&cmd, CC, CC_FLAGS, CC_EXTRA_FLAG);
 
-	File file = sources.buffer[n];
-	const char *output = PATH(out, replace_extension(file.name, "obj"));
-	cmd_append(&cmd, "-c", file.path);
-	cmd_append(&cmd, "-o", output);
+        File file = sources.buffer[n];
+        const char *output = PATH(out, replace_extension(file.name, "obj"));
+        cmd_append(&cmd, "-c", file.path);
+        cmd_append(&cmd, "-o", output);
 	
-	cmd_append(&bcmd, output);
-	if (cmd_run_sync(cmd)) {
-	    return 0;
-	}
+        cmd_append(&bcmd, output);
+        if (cmd_run_sync(cmd)) {
+            return 0;
+        }
     }
 
     cmd_append(&bcmd, "-o", PATH(BINARY_DIR, EXE_NAME));
     if (!cmd_run_sync(bcmd))
-	return 0;
+        return 0;
 
     return 1;
 }
@@ -57,29 +57,29 @@ int build_compiler_library()
     
     DONT_LOG(MKDIRS(out));
     DONT_LOG(MKDIRS(dir));
-
+    
     Cmd bcmd = {0};
     cmd_append(&bcmd, CC, "-shared");
     
     Files sources = all_files_with_extension(dir, "c", true);
     for (int n = 0; n < sources.count; ++n) {
-	Cmd cmd = {0};
-	cmd_append(&cmd, CC, CC_FLAGS, CC_EXTRA_FLAG);
+        Cmd cmd = {0};
+        cmd_append(&cmd, CC, CC_FLAGS, CC_EXTRA_FLAG);
 
-	File file = sources.buffer[n];
-	const char *output = PATH(out, replace_extension(file.name, "obj"));
-	cmd_append(&cmd, "-c", file.path);
-	cmd_append(&cmd, "-o", output);
+        File file = sources.buffer[n];
+        const char *output = PATH(out, replace_extension(file.name, "obj"));
+        cmd_append(&cmd, "-c", file.path);
+        cmd_append(&cmd, "-o", output);
 	
-	cmd_append(&bcmd, output);
-	if (cmd_run_sync(cmd)) {
-	    return 0;
-	}
+        cmd_append(&bcmd, output);
+        if (cmd_run_sync(cmd)) {
+            return 0;
+        }
     }
 
     cmd_append(&bcmd, "-o", PATH(BINARY_DIR, LIB_NAME));
     if (!cmd_run_sync(bcmd))
-	return 0;
+        return 0;
 
     return 1;
 }
@@ -90,7 +90,7 @@ int main(int argc, char **argv)
     arg_set_context(argc, argv);
 
     if (arg_has_flag("-debug")) {
-	CC_EXTRA_FLAG = CONCAT(CC_EXTRA_FLAG, "-ggdb ");
+        CC_EXTRA_FLAG = CONCAT(CC_EXTRA_FLAG, "-ggdb ");
     }
     
     DONT_LOG(MKDIRS(BINARY_DIR));
@@ -100,26 +100,26 @@ int main(int argc, char **argv)
     int build_exe = false;
     
     if (arg_has_flag("-lib"))
-	build_lib = true;
+        build_lib = true;
     
     if (arg_has_flag("-exe")) {
-	build_lib = true;
-	build_exe = true;
+        build_lib = true;
+        build_exe = true;
     }
     
     if (arg_has_flag("-exe-only")) {
-	build_exe = true;
+        build_exe = true;
     }
 
     if (build_lib) build_compiler_library();
     if (build_exe) build_compiler();
 
     if (arg_has_flag("-test-lang")) {
-	run_language_tests();
+        run_language_tests();
     }
 
     if (arg_has_flag("-test-compiler")) {
-	run_compiler_tests();
+        run_compiler_tests();
     }
 }
 
@@ -132,24 +132,24 @@ void run_compiler_tests() {
 
     Files files = all_files_with_extension(dir, "c", false);
     for(int n = 0; n < files.count; ++n) {
-	File file = files.buffer[n];
+        File file = files.buffer[n];
 
-	const char *output = PATH(out, replace_extension(file.name, "test"));
+        const char *output = PATH(out, replace_extension(file.name, "test"));
 	
-	Cmd cmd = {0};
-	cmd_append(&cmd, CC, "-I./include", "-std=c23", "-L"BINARY_DIR, "-Wl,-rpath="BINARY_DIR, "-lmercury");
-	cmd_append(&cmd, file.path, "-o", output);
-	if (cmd_run_sync(cmd)) {
-	    CBUILD_LOG(ERROR, "Test (%s) failed", file.name);
-	} else {
-	    cmd.count = 0;
-	    cmd_append(&cmd, output);
-	    if (cmd_run_sync(cmd)) {
-		CBUILD_LOG(ERROR, "Test (%s) failed", file.name);
-	    } else {
-		CBUILD_LOG(INFO, "Test (%s) passed", file.name);
-	    }
-	}
+        Cmd cmd = {0};
+        cmd_append(&cmd, CC, "-I./include", "-std=c23", "-L"BINARY_DIR, "-Wl,-rpath="BINARY_DIR, "-lmercury");
+        cmd_append(&cmd, file.path, "-o", output);
+        if (cmd_run_sync(cmd)) {
+            CBUILD_LOG(ERROR, "Test (%s) failed", file.name);
+        } else {
+            cmd.count = 0;
+            cmd_append(&cmd, output);
+            if (cmd_run_sync(cmd)) {
+                CBUILD_LOG(ERROR, "Test (%s) failed", file.name);
+            } else {
+                CBUILD_LOG(INFO, "Test (%s) passed", file.name);
+            }
+        }
     }
 }
 

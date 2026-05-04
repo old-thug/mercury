@@ -31,7 +31,7 @@ ssize fs_read_entire_file(const char *path, char **out)
 {
     FILE *file = fopen(path, "rb");
     if (!file) {
-	return -1;
+        return -1;
     }
     
     fseek(file, 0, SEEK_END);
@@ -42,7 +42,7 @@ ssize fs_read_entire_file(const char *path, char **out)
     int ch = 0;
     
     while ((ch = fgetc(file)) != EOF) {
-	arr_push(*out, ch);
+        arr_push(*out, ch);
     }
     arr_push(*out, 0);
 

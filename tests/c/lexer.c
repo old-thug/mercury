@@ -16,8 +16,8 @@ void lex_identifier() {
 
 void lex_function() {
     array(char) source = create_source(
-				       "proc main() {\n"
-				       "}\n");
+                                       "proc main() {\n"
+                                       "}\n");
     Lexer lexer = lexer_init(0, source);
     Token tok;
 

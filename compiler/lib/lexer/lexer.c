@@ -94,30 +94,30 @@ static const int PUNCT_COUNT = sizeof(PUNCTS)/sizeof(struct spec_t);
 
 static bool is_alpha(codepoint_t cp) {
     return
-	(cp >= 'a' && cp <= 'z') ||
-	(cp >= 'A' && cp <= 'Z') ||
-	(cp == '_') ||
-	(cp > 127);
+        (cp >= 'a' && cp <= 'z') ||
+        (cp >= 'A' && cp <= 'Z') ||
+        (cp == '_') ||
+        (cp > 127);
 }
 
 static bool is_digit(codepoint_t cp, int base) {
     if (base == 2) {
-	return (cp == '0' || cp == '1');
+        return (cp == '0' || cp == '1');
     }
 
     if (base == 8) {
-	return (cp >= '0' && cp <= '7');
+        return (cp >= '0' && cp <= '7');
     }
 
     if (base == 10) {
-	return (cp >= '0' && cp <= '9');
+        return (cp >= '0' && cp <= '9');
     }
 
     if (base == 16) {
-	return
-	    (cp >= '0' && cp <= '9') ||
-	    (cp >= 'a' && cp <= 'f') ||
-	    (cp >= 'A' && cp <= 'F');
+        return
+            (cp >= '0' && cp <= '9') ||
+            (cp >= 'a' && cp <= 'f') ||
+            (cp >= 'A' && cp <= 'F');
     }
 
     return false;
@@ -137,7 +137,7 @@ int lexer_decode_utf8_at_point(Lexer *l, codepoint_t *cp) {
         return 3;
     } else if ((c & 0xF8) == 0xF0) {
         *cp = ((c & 0x07) << 18) | ((s[1] & 0x3F) << 12) |
-              ((s[2] & 0x3F) << 6) | (s[3] & 0x3F);
+            ((s[2] & 0x3F) << 6) | (s[3] & 0x3F);
         return 4;
     }
     return -1; // Invalid Utf8
@@ -161,13 +161,13 @@ Lexer lexer_init(ModuleId id, const array(char) source) {
 codepoint_t lexer_current(Lexer *l)
 {
     if (lexer_is_done(l)) {
-	return EOF;
+        return EOF;
     }
 
     codepoint_t cp;
     int len = lexer_decode_utf8_at_point(l, &cp);
     if (len <= 0) {
-	return EOF;
+        return EOF;
     }
     return cp;
 }
@@ -176,10 +176,10 @@ codepoint_t lexer_eat(Lexer *l)
 {
     auto ch = lexer_current(l);
     if (ch == '\n') {
-	l->line += 1;
-	l->col   = 1;
+        l->line += 1;
+        l->col   = 1;
     } else
-	l->col += 1;
+        l->col += 1;
 
     l->offset += 1;
     return ch;
@@ -197,22 +197,22 @@ char lexer_take(Lexer *l, int count, ...)
     va_start(args, count);
     
     for (usize n = 0; n < count; ++n) {
-	char ch = va_arg(args, int);
-	if (lexer_current(l) == ch) {
-	    lexer_eat(l);
-	    return ch;
-	}
+        char ch = va_arg(args, int);
+        if (lexer_current(l) == ch) {
+            lexer_eat(l);
+            return ch;
+        }
     }
     return EOF;
 }
 
 void lexer_eat_prefix(Lexer *l, const char *prefix) {
     if (!lexer_prefix(l, prefix)) {
-	return;
+        return;
     }
 
     for(int n = 0; n < strlen(prefix); ++n) {
-	lexer_eat(l);
+        lexer_eat(l);
     }
 }
 
@@ -222,107 +222,107 @@ Span lexer_here(Lexer *l) {
 
 bool lexer_next(Lexer *l, Token *out, struct lex_error_t *err_out) {
     if (lexer_is_done(l)) {
-	lexer_token(l, out, TOK_EndofFile);
+        lexer_token(l, out, TOK_EndofFile);
     }
 
     for(;;) {
 
-	if (lexer_current(l) == ' ' ||
-	    lexer_current(l) == '\n' ||
-	    lexer_current(l) == '\r') {
-	    lexer_eat(l);
-	    continue;
-	}
+        if (lexer_current(l) == ' ' ||
+            lexer_current(l) == '\n' ||
+            lexer_current(l) == '\r') {
+            lexer_eat(l);
+            continue;
+        }
 
-	if (lexer_prefix(l, "//")) {
-	    lexer_eat_prefix(l, "//");
-	    while (!lexer_is_done(l) &&
-		   lexer_current(l) != '\n') {
-		lexer_eat(l);
-	    }
-	    lexer_eat(l);
-	    continue;
-	}
+        if (lexer_prefix(l, "//")) {
+            lexer_eat_prefix(l, "//");
+            while (!lexer_is_done(l) &&
+                   lexer_current(l) != '\n') {
+                lexer_eat(l);
+            }
+            lexer_eat(l);
+            continue;
+        }
 	
-	break;
+        break;
     }
     
     if (lexer_is_done(l)) {
-	lexer_token(l, out, TOK_EndofFile);
+        lexer_token(l, out, TOK_EndofFile);
     }
 
     l->pcol = l->col;
 
     if (is_alpha(lexer_current(l))) {
-	auto begin = l->offset;
-	while (!lexer_is_done(l) && (is_alpha(lexer_current(l)) || is_digit(lexer_current(l), 10))) {
-	    lexer_eat(l);
-	}
-	auto end = l->offset;
-	StringView slice = sv_init(&l->source[begin], end - begin);
-	for(usize n = 0; n < KEYWORD_COUNT; ++n) {
-	    struct spec_t spec = KEYWORDS[n];
-	    if (sv_equals_str(slice, spec.str)) {
-		lexer_token(l, out, spec.kind);
-		return true;
-	    }
-	}
-	lexer_token(l, out, TOK_Id);
-	return true;
+        auto begin = l->offset;
+        while (!lexer_is_done(l) && (is_alpha(lexer_current(l)) || is_digit(lexer_current(l), 10))) {
+            lexer_eat(l);
+        }
+        auto end = l->offset;
+        StringView slice = sv_init(&l->source[begin], end - begin);
+        for(usize n = 0; n < KEYWORD_COUNT; ++n) {
+            struct spec_t spec = KEYWORDS[n];
+            if (sv_equals_str(slice, spec.str)) {
+                lexer_token(l, out, spec.kind);
+                return true;
+            }
+        }
+        lexer_token(l, out, TOK_Id);
+        return true;
     }
 
     if (is_digit(lexer_current(l), 10)) {
-	int base = 10;
-	if (lexer_current(l) == '0') {
-	    lexer_eat(l);
-	    codepoint_t ch = lexer_take(l, 8, 'x', 'X', 'b', 'B', 'd', 'D', 'o', 'O');
-	    if (ch != EOF) {
-		switch (ch) {
-		case 'x':
-		case 'X':
-		    base = 16;
-		    break;
-		case 'b':
-		case 'B':
-		    base = 2;
-		    break;
-		case 'd':
-		case 'D':
-		    base = 10;
-		    break;
-		case 'o':
-		case 'O':
-		    base = 8;
-		    break;
-		default:
-		    todo();
-		}
-	    }
-	}
+        int base = 10;
+        if (lexer_current(l) == '0') {
+            lexer_eat(l);
+            codepoint_t ch = lexer_take(l, 8, 'x', 'X', 'b', 'B', 'd', 'D', 'o', 'O');
+            if (ch != EOF) {
+                switch (ch) {
+                case 'x':
+                case 'X':
+                    base = 16;
+                    break;
+                case 'b':
+                case 'B':
+                    base = 2;
+                    break;
+                case 'd':
+                case 'D':
+                    base = 10;
+                    break;
+                case 'o':
+                case 'O':
+                    base = 8;
+                    break;
+                default:
+                    todo();
+                }
+            }
+        }
 
-	if (lexer_is_done(l)) {
-	    if (err_out) {
-		err_out->message = "expected numeric literal after numeric prefix";
-		err_out->span    = lexer_here(l);
-	    }
-	    return false;
-	}
+        if (lexer_is_done(l)) {
+            if (err_out) {
+                err_out->message = "expected numeric literal after numeric prefix";
+                err_out->span    = lexer_here(l);
+            }
+            return false;
+        }
 
-	while (!lexer_is_done(l) && is_digit(lexer_current(l), base)) {
-	    lexer_eat(l);
-	}
+        while (!lexer_is_done(l) && is_digit(lexer_current(l), base)) {
+            lexer_eat(l);
+        }
 
-	lexer_token(l, out, TOK_IntLiteral);
-	return true;
+        lexer_token(l, out, TOK_IntLiteral);
+        return true;
     }
     
     for(usize n = 0; n < PUNCT_COUNT; ++n) {
-	struct spec_t spec = PUNCTS[n];
-	if (lexer_prefix(l, spec.str)) {
-	    lexer_eat_prefix(l, spec.str);
-	    lexer_token(l, out, spec.kind);
-	    return true;
-	}
+        struct spec_t spec = PUNCTS[n];
+        if (lexer_prefix(l, spec.str)) {
+            lexer_eat_prefix(l, spec.str);
+            lexer_token(l, out, spec.kind);
+            return true;
+        }
     }
 
     todo();
